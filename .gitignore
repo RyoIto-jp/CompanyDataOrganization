@@ -30,3 +30,7 @@ myvenv
 
 # driver
 driver
+
+# userdata
+result/*
+tmp/*

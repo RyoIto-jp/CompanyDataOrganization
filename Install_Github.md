@@ -113,3 +113,10 @@ git reset --soft f85f72e3b0fde923ace815e253f2268a20d5649a
 以下をインストールでいろいろ管理楽に。100MBオーバーの件はこれで解決。
 
 GitLens — Git supercharged
+
+
+
+### 参考
+
+https://qiita.com/shungo_m/items/b73ff5b1ec6d69bb5c50
+

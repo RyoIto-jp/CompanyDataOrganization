@@ -2,6 +2,10 @@
 
 
 
+https://github.com/RyoIto-jp/CompanyDataOrganization
+
+
+
 ## Installation
 
 
@@ -146,9 +150,52 @@ if __name__ == '__main__':
 
 
 
+### フォルダ構成変更
+
+`./` -> `web/`
+
+https://www.luku.work/create-react-app-rename-src
 
 
 
+```shell
+yarn add -D react-app-rewired
+```
+
+
+
+ROOTに`config-overrides.js`を作成
+
+```js
+const path = require('path');
+module.exports = {
+  paths: function(paths, env) {
+    paths.appPublic = path.resolve(__dirname, 'web/public');
+    paths.appHtml = path.resolve(__dirname, 'web/public/index.html');
+    paths.appIndexJs = path.resolve(__dirname, 'web/src/index.js');
+    paths.appSrc = path.resolve(__dirname, 'web/src');
+    paths.appBuild = path.resolve(__dirname, 'web/build');
+    return paths;
+  }
+};
+```
+
+
+
+`package.json`を修正
+
+```json
+{
+  "name": "create-react-app-with-eel",
+   //...
+  },
+  "scripts": {
+    //...
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    //...
+  },
+```
 
 
 
