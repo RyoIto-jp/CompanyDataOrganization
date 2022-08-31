@@ -22,7 +22,12 @@ const useStyles = makeStyles({
 
 /** project名から余分なテキストを削除 */
 function fixTypeName(typeName) {
-  return typeName.slice(typeName.indexOf("]") + 1, typeName.length).replace("アウトソーシングテクノロジー", '').replace("株式会社", '').replace(' ', '').replace('（', '').replace('）', '').replace('RD-刈谷ｱｳﾄｿｰｼﾝｸﾞﾃｸﾉﾛｼﾞｰ','').replace('RD-浜松ｱｳﾄｿｰｼﾝｸﾞﾃｸﾉﾛｼﾞｰ','').replace('RD-刈谷愛三工業愛三工業','刈谷支店愛三工業')
+  return typeName.slice(typeName.indexOf("]") + 1, typeName.length)
+    .replace("アウトソーシングテクノロジー", '')
+    .replace("株式会社", '')
+    .replace(/( |）|（)/g,'')
+    .replace(/RD-(.*)ｱｳﾄｿｰｼﾝｸﾞﾃｸﾉﾛｼﾞｰ/g,'')
+    .replace('RD-刈谷愛三工業愛三工業','刈谷支店愛三工業')
 }
 
 // hh:mm を hour(int)に変換
@@ -58,11 +63,20 @@ const ProjectView = (props) => {
       }
       return true
     })
-    const projects = newData.filter((x, i, self) =>
-      self.findIndex(e => e.type === x.type) === i && x.type
-    ).map(row => fixTypeName(row.type))
+
+    // プロジェクトコード一覧
+    const projects = newData
+      .filter((x, i, self) =>
+        self.findIndex(e => e.type === x.type) === i && x.type
+      )
+      .map(x=>x.type).map(row => fixTypeName(row))
+      .filter((x, i, self) =>
+        self.findIndex(e => e === x) === i && x
+      )
+      console.log(projects)
     setPrjList(projects)
 
+    // ステータス一覧
     const newStatusList = newData
       .filter((x, i, self) => self.findIndex(e => e.status === x.status) === i && x.status)
       .map(x => x.status)
@@ -119,7 +133,7 @@ const ProjectView = (props) => {
   }
 
   const plotColors = [
-    "#8884d8", "#82ca9d", "#ca829d", "#FF00FF"
+    "#8884d8", "#82ca9d", "#ca829d","#CC8855", "#558888", "#FF00FF"
   ]
 
   return (
