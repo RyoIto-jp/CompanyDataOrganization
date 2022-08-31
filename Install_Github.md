@@ -4,7 +4,7 @@
 
 
 
-![image-20220830235747669](https://github.com/RyoIto-jp/CompanyDataOrganization/blob/masterInstall_Github.assets\image-20220830235747669.png)
+![image-20220830235747669](https://github.com/RyoIto-jp/CompanyDataOrganization/blob/master/Install_Github.assets/image-20220830235747669.png)
 
 
 
