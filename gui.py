@@ -1,4 +1,3 @@
-# coding: utf-8
 from src import pickle_obj as pkl
 from src import company
 import glob
@@ -118,7 +117,7 @@ def disable_chromium_api_message():
 # develop用起動処理
 def react_run():
     disable_chromium_api_message()
-    eel.init("client", ['.tsx', '.ts', '.jsx', '.js', '.html'])
+    eel.init("web", ['.tsx', '.ts', '.jsx', '.js', '.html'])
     eel.start({"port": 3000}, host="localhost", port=8888, size=(1400, 850), position=(200, 200), close_callback=python_exit)
 
 
@@ -144,5 +143,5 @@ if __name__ == '__main__':
         eel.init('client')
         react_run()
     else:
-        eel.init('build')
+        eel.init('web/build')
         eel.start('index.html')
