@@ -29,7 +29,7 @@ const DownloadsPage = () => {
   async function handleSubmit() {
     console.log('Submit arg')
     console.log(val)
-    let result = await eel.sync_js_py(val)();
+    let result = await eel.py_download_company(val)();
     console.log('Submit ret')
     console.log(result);
     // setVal(result)

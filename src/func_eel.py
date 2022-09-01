@@ -35,7 +35,7 @@ def updateMessage(text):
 
 
 @eel.expose
-def sync_js_py(val):
+def py_download_company(val):
     print(val)
     print('called')
     pkl.pkl_dumps_loads(val, 'company_cond')
