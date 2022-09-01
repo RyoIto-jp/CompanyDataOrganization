@@ -21,7 +21,7 @@
   "scripts": {
     "start:js": "react-scripts start",
     "build:js": "react-scripts build",
-    "start:eel": "python index.py --develop",
+    "start:eel": "python gui.py --develop",
     "build:eel": "python -m eel index.py build --onefile --noconsole --name react-eel-app",
     "clean:build": "rm -rf build dist",
     "start": "react-app-rewired start",
