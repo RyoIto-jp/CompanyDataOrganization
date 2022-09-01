@@ -3,5 +3,22 @@
     "activityBar.background": "#0D286B",
     "titleBar.activeBackground": "#123896",
     "titleBar.activeForeground": "#F9FAFE"
+  },
+  "editor.tabSize": 4,
+  "editor.defaultFormatter": "ms-python.python",
+  "python.languageServer": "Pylance",
+//   "python.analysis.typeCheckingMode": "off",
+  "python.analysis.typeCheckingMode": "off",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--ignore=W293, W504, E241", "--max-line-length=160"],
+  "python.linting.lintOnSave": true,
+  "python.formatting.provider": "autopep8",
+  "python.formatting.autopep8Args": ["--aggressive"],
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

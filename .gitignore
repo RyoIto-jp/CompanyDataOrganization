@@ -34,3 +34,4 @@ driver
 # userdata
 result/*
 tmp/*
+database.db

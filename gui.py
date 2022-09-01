@@ -17,12 +17,6 @@ def python_function(val):
     time.sleep(3)
 
 
-# @eel.expose
-def python_exit(page, sockets):
-    if not sockets:
-        sys.exit()
-
-
 @eel.expose
 def load_labels_from_file():
     return [{"Test": 1, "name": "test"}, {"Test": 2, "name": "testman"}]
@@ -58,7 +52,7 @@ def sync_js_py(val):
         "members": members,
         "is_self": val['isSelf']
     }
-    
+
     print(members)
     if members:
         company.main(web_settings, eel=eel)
@@ -94,17 +88,23 @@ def getFileDatas(fileList: dict[str, str]) -> list[dict[str, str]]:
     data = []
     for filename in fileList:
         with open('result/' + filename, encoding='utf8') as fr:
-            csv_data_obj = csv.DictReader(fr, delimiter=",", doublequote=True, lineterminator="\r\n", quotechar='"', skipinitialspace=True)
+            csv_data_obj = csv.DictReader(
+                fr,
+                delimiter=",",
+                doublequote=True,
+                lineterminator="\r\n",
+                quotechar='"',
+                skipinitialspace=True)
             csv_data_dict = [row for row in csv_data_obj]
             data.extend(csv_data_dict)
-    
+
     return data
 
 
 @eel.expose
 def hello():
     print('hello')
-    
+
 
 # ChromiumのAPIキー欠落アラートの非表示
 def disable_chromium_api_message():
@@ -118,7 +118,8 @@ def disable_chromium_api_message():
 def react_run():
     disable_chromium_api_message()
     eel.init("web", ['.tsx', '.ts', '.jsx', '.js', '.html'])
-    eel.start({"port": 3000}, host="localhost", port=8888, size=(1400, 850), position=(200, 200), close_callback=python_exit)
+    eel.start({"port": 3000}, host="localhost", port=8888, size=(
+        1400, 850), position=(200, 200), close_callback=python_exit)
 
 
 # 終了時処置
@@ -139,9 +140,9 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         debug_mode = 1 if sys.argv[1] == '--develop' else 0
 
-    if  debug_mode == 1:
+    if debug_mode == 1:
         eel.init('client')
         react_run()
     else:
         eel.init('web/build')
-        eel.start('index.html')
+        eel.start('index.html', close_callback=python_exit)
