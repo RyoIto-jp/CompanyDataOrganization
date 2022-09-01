@@ -9,19 +9,17 @@ from src import func_eel
 print(func_eel, None)
 # from src.func_eel import *
 
-# ChromiumのAPIキー欠落アラートの非表示
-
 
 def disable_chromium_api_message():
-    "https://code-examples.net/ja/q/144a85b"
+    """ ChromiumのAPIキー欠落アラートの非表示
+    https://code-examples.net/ja/q/144a85b"""
     os.environ["GOOGLE_API_KEY"] = 'no'
     os.environ["GOOGLE_DEFAULT_CLIENT_ID"] = 'no'
     os.environ["GOOGLE_DEFAULT_CLIENT_SECRET "] = 'no'
 
 
-# develop用起動処理
 def react_run():
-    disable_chromium_api_message()
+    # develop用起動処理
     eel.init("web", ['.tsx', '.ts', '.jsx', '.js', '.html'])
     eel.start({"port": 3000}, host="localhost", port=8888, size=(
         1400, 850), position=(200, 200), close_callback=python_exit)
@@ -33,6 +31,7 @@ def python_exit(page, sockets):
         sys.exit()
 
 
+disable_chromium_api_message()
 # Eel(GUI)を表示するブラウザをChromiumに設定(Chrome未インストールPC用)
 ROOT_DIR = os.path.dirname(sys.argv[0])
 chrome_path = os.path.join(ROOT_DIR, 'driver/chrome-win/chrome.exe')
