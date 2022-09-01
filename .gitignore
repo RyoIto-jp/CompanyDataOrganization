@@ -35,4 +35,4 @@ driver
 result/*
 tmp/*
 database.db
-memo.txt
+memo.txt*

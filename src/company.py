@@ -215,7 +215,7 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
 
     print("start playwright...")
     browser = playwright.chromium.launch(
-        headless=False,  # ! DEBUG
+        headless=True,  # ! DEBUG
         executable_path="./driver/chrome-win/chrome.exe")
     context = browser.new_context()
 

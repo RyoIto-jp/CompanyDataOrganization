@@ -7,9 +7,11 @@ import eel
 
 from src import func_eel
 print(func_eel, None)
-
+# from src.func_eel import *
 
 # ChromiumのAPIキー欠落アラートの非表示
+
+
 def disable_chromium_api_message():
     "https://code-examples.net/ja/q/144a85b"
     os.environ["GOOGLE_API_KEY"] = 'no'
@@ -38,7 +40,7 @@ if os.path.exists(chrome_path):
     eel.browsers.set_path('chrome', chrome_path)
 
 if __name__ == '__main__':
-    debug_mode = 1
+    debug_mode = 0
 
     if len(sys.argv) > 1:
         debug_mode = 1 if sys.argv[1] == '--develop' else 0
@@ -48,4 +50,10 @@ if __name__ == '__main__':
         react_run()
     else:
         eel.init('web/build')
-        eel.start('index.html', close_callback=python_exit)
+        eel.start(
+            'index.html',
+            port=8888,
+            size=(1400, 850),
+            position=(200, 200),
+            close_callback=python_exit
+        )
