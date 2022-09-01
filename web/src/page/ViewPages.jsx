@@ -36,8 +36,8 @@ const ViewPages = () => {
         fileList.data = await pyGetFileList() //* --- get file list ---
         dataList = await pyGetFiles(fileList) //* --- get worktime data each file. ---
       } else {
-        fileList = await jsGetFileList()      //* --- get file list ---
-        dataList = await jsGetFiles(fileList) //* --- get worktime data each file. ---
+        // fileList = await jsGetFileList()      //* --- get file list ---
+        // dataList = await jsGetFiles(fileList) //* --- get worktime data each file. ---
       }
       // console.log(fileList)
       // console.log(dataList)

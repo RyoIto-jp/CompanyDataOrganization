@@ -34,3 +34,5 @@ driver
 # userdata
 result/*
 tmp/*
+database.db
+memo.txt

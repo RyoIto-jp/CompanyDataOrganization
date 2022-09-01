@@ -11,7 +11,11 @@ def loginCompany(page, cred):
     page.locator("input[name=\"uid\"]").fill(cred["user"])
     page.locator("input[name=\"pwd\"]").fill(cred["pass"])
     page.locator("input[alt=\"login\"]").press("Enter")
-    return page
+    
+    loginStatus = False
+    if page.title() == 'メインメニュー':
+        loginStatus = True
+    return page, loginStatus
 
 
 def moveToApprovalPage(page):
@@ -219,39 +223,46 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
     page = context.new_page()
 
     # Login to Company
-    page = loginCompany(page, credential)
-    if eel:
-        eel.pyUpdateMessage("Company認証完了")
-
-    # getWorkTimeMe
-    if is_self:
-        # todo: 月度移動
-        page, empName, reportStatus = navMyPage(page, target_date)
+    page, loginStatus = loginCompany(page, credential)
+    
+    if not loginStatus:
         if eel:
-            eel.pyUpdateMessage(f"{empName}の処理を実行中")
-        # 工数CSVを取得
-        getUserWorkTime(page, credential['user'], empName, reportStatus, target_date)
-        page.locator('.globalnavi > div:nth-child(1) > a').click()
-        print('complete my worktime')
+            eel.pyUpdateMessage("ログインに失敗しました。処理を中断します。")
+    
+    else:
+        if eel:
+            eel.pyUpdateMessage("Company認証完了")
 
-    # Go to the Company Approval Page
-    page = moveToApprovalPage(page)
+        # getWorkTimeMe
+        if is_self:
+            # todo: 月度移動
+            page, empName, reportStatus = navMyPage(page, target_date)
+            if eel:
+                eel.pyUpdateMessage(f"{empName}の処理を実行中")
+            # 工数CSVを取得
+            getUserWorkTime(page, credential['user'], empName, reportStatus, target_date)
+            page.locator('.globalnavi > div:nth-child(1) > a').click()
+            print('complete my worktime')
 
-    for i, empNum in enumerate(members):
-        page, empName, reportStatus = navMemberPage(page, target_date, empNum)
+        # Go to the Company Approval Page
+        page = moveToApprovalPage(page)
+
+        for i, empNum in enumerate(members):
+            page, empName, reportStatus = navMemberPage(page, target_date, empNum)
+
+            if eel:
+                eel.pyUpdateMessage(f"{empName}の処理を実行中 {i + 1}/{len(members)}")
+
+            # 工数CSVを取得
+            getUserWorkTime(page, empNum, empName, reportStatus, target_date)
+            page.query_selector('#BTNBCK0').click()
 
         if eel:
-            eel.pyUpdateMessage(f"{empName}の処理を実行中 {i + 1}/{len(members)}")
+            eel.pyUpdateMessage("処理が完了しました")
+            print("処理が完了しました")
 
-        # 工数CSVを取得
-        getUserWorkTime(page, empNum, empName, reportStatus, target_date)
-        page.query_selector('#BTNBCK0').click()
-
-    if eel:
-        eel.pyUpdateMessage("処理が完了しました")
-
-    context.close()
-    browser.close()
+        context.close()
+        browser.close()
 
 
 def main(web_settings: dict, eel=None):
