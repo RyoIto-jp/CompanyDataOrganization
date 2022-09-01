@@ -5,7 +5,8 @@ import os
 import eel.browsers
 import eel
 
-from src.func_eel import *  # type:ignore
+from src import func_eel
+print(func_eel, None)
 
 
 # ChromiumのAPIキー欠落アラートの非表示
