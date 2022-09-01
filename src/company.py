@@ -121,11 +121,14 @@ def getTable(popup, target_year):
     result = []
 
     for row in table_rows[1:]:
+        tempWork = row.query_selector("td:nth-child(3)")
+        # 提出状況
+        rowStatus = getStatus(tempWork.get_attribute('class'))
+        # 業務区分
+        rowWork = tempWork.text_content()
+
         # 日付
         tempDate = row.query_selector("td >> nth=0")
-        # 提出状況
-        rowStatus = getStatus(tempDate.get_attribute('class'))
-
         # 日付がない行は処理をしない
         if tempDate.query_selector("#MONTH"):
             targetDate = target_year + '-' + tempDate.query_selector("#MONTH").text_content() + '-' + tempDate.query_selector("#DAY").text_content()
@@ -148,6 +151,7 @@ def getTable(popup, target_year):
         for prj in tempProjects.query_selector_all("tr"):
             resPrj = prj.query_selector("td:nth-child(3)").text_content()[1:-1]
             result_row["date"] = targetDate
+            result_row["work"] = rowWork
             result_row['status'] = rowStatus
             result_row["times"] = resPrj
             result_row["type"] = prj.query_selector("td:nth-child(2)").text_content()
@@ -211,7 +215,7 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
 
     print("start playwright...")
     browser = playwright.chromium.launch(
-        headless=True,  # ! DEBUG
+        headless=False,  # ! DEBUG
         executable_path="./driver/chrome-win/chrome.exe")
     context = browser.new_context()
 
