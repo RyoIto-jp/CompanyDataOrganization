@@ -5,8 +5,9 @@ import os
 import eel.browsers
 import eel
 
+from src import find_browser
 from src import func_eel
-print(func_eel, None)
+print(func_eel)
 # from src.func_eel import *
 
 
@@ -31,12 +32,25 @@ def python_exit(page, sockets):
         sys.exit()
 
 
+def setChromePath():
+    """Eel(GUI)を表示するブラウザをChromiumに設定
+
+    Returns:
+        str: Path to chrome.exe
+    """
+    chrome_path = find_browser.findBrowserPath('chrome')
+    if not chrome_path:
+        ROOT_DIR = os.path.dirname(sys.argv[0])
+        chrome_path = os.path.join(ROOT_DIR, 'driver/chrome-win/chrome.exe')
+
+    if os.path.exists(chrome_path):
+        eel.browsers.set_path('chrome', chrome_path)
+    return chrome_path
+
+
 disable_chromium_api_message()
-# Eel(GUI)を表示するブラウザをChromiumに設定(Chrome未インストールPC用)
-ROOT_DIR = os.path.dirname(sys.argv[0])
-chrome_path = os.path.join(ROOT_DIR, 'driver/chrome-win/chrome.exe')
-if os.path.exists(chrome_path):
-    eel.browsers.set_path('chrome', chrome_path)
+setChromePath()  # Eel(GUI)を表示するブラウザをChromiumに設定(Chrome未インストールPC用)
+
 
 if __name__ == '__main__':
     debug_mode = 0

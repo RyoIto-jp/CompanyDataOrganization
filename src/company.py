@@ -1,4 +1,5 @@
 from playwright.sync_api import Playwright, sync_playwright
+from . import find_browser
 import csv
 import os
 
@@ -213,10 +214,14 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
     members = web_settings["members"]
     is_self = web_settings.get("is_self")
 
+    chrome_path = find_browser.findBrowserPath('chrome')
+    if not chrome_path:
+        chrome_path = "./driver/chrome-win/chrome.exe"
+
     print("start playwright...")
     browser = playwright.chromium.launch(
         headless=True,  # ! DEBUG
-        executable_path="./driver/chrome-win/chrome.exe")
+        executable_path=chrome_path)
     context = browser.new_context()
 
     # Test Eel
