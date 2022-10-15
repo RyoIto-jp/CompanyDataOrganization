@@ -32,14 +32,15 @@ def python_exit(page, sockets):
         sys.exit()
 
 
-def setChromePath():
+def setChromePath(useDriver=False):
     """Eel(GUI)を表示するブラウザをChromiumに設定
 
     Returns:
         str: Path to chrome.exe
     """
     chrome_path = find_browser.findBrowserPath('chrome')
-    if not chrome_path:
+    if chrome_path == "" or useDriver:
+        print('use the downloaded webDriver')
         ROOT_DIR = os.path.dirname(sys.argv[0])
         chrome_path = os.path.join(ROOT_DIR, 'driver/chrome-win/chrome.exe')
 

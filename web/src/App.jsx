@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+// import {hot} from 'react-hot-loader'
 import './App.css';
 
 import { CenteredTabs } from './component/Tabs';
 import ViewPages from './page/ViewPages';
 import DownloadsPage from './page/DownloadsPage'
+import Users from "./page/Users";
 
 import { eel } from "./function/eel.js";
 
@@ -16,7 +18,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <CenteredTabs labels={["Views", "Downloads", "Logs"]}>
+        <CenteredTabs labels={["Users", "Views", "Downloads", "Logs", ]}>
+          <Users></Users>
           <ViewPages></ViewPages>
           <DownloadsPage></DownloadsPage>
           <p>test</p>
@@ -27,3 +30,4 @@ class App extends Component {
 }
 
 export default App;
+// export default process.env.NODE_ENV === "development" ? hot(module)(App) : App

@@ -1,9 +1,11 @@
 import eel
 from . import pickle_obj as pkl
 from . import company
+import datetime
 import glob
 import time
 import csv
+import os
 
 
 @eel.expose
@@ -99,4 +101,64 @@ def getFileDatas(fileList: dict[str, str]) -> list[dict[str, str]]:
 
 @eel.expose
 def hello():
-    print('hello')
+    print('hello2')
+
+
+# ----------
+# Users
+# ----------
+@eel.expose
+def getUsers():
+    data = []
+    with open('tmp/users.csv', encoding='sjis') as fr:
+        csv_data_obj = csv.DictReader(
+            fr,
+            delimiter=",",
+            doublequote=True,
+            lineterminator="\r\n",
+            quotechar='"',
+            skipinitialspace=True)
+        csv_data_dict = [row for row in csv_data_obj]
+        data.extend(csv_data_dict)
+    return data
+
+
+@eel.expose
+def openUsersCsv():
+    os.system("start " + os.path.join(os.getcwd(), 'tmp/users.csv'))
+
+
+@eel.expose
+def updateUser(users, payload):
+    with open('tmp/users.csv', 'w', encoding='sjis', newline="") as fw:
+        writer = csv.DictWriter(fw, fieldnames=users[0].keys())
+        writer.writeheader()
+        for index, elem in enumerate(users):
+            if index == payload["index"]:
+                elem[payload["key"]] = payload["value"]
+                elem["modified"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+            writer.writerow(elem)
+    return payload
+
+
+@eel.expose
+def addUser(users):
+    print(datetime.datetime.now())
+    with open('tmp/users.csv', 'a', encoding='sjis', newline="") as fw:
+        writer = csv.DictWriter(fw, fieldnames=users[0].keys())
+        newData = {"id": "", "name": "", "created": datetime.datetime.now().strftime("%Y/%m/%d %H:%M"), "modified": ""}
+        writer.writerow(newData)
+    return newData
+
+
+@eel.expose
+def deleteUser(users, deleteIndex):
+    with open('tmp/users.csv', 'w', encoding='sjis', newline="") as fw:
+        writer = csv.DictWriter(fw, fieldnames=users[0].keys())
+        writer.writeheader()
+        for index, elem in enumerate(users):
+            if index == deleteIndex:
+                result = elem
+            else:
+                writer.writerow(elem)
+    return result

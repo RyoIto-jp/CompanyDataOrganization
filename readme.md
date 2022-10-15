@@ -1,6 +1,7 @@
-# CompanyDataOrganization
+# CompanyDataOrganization for Dev
 
-
+開発者用のドキュメントです。
+環境構築の方法や各種TIPSを残していきます。
 
 https://github.com/RyoIto-jp/CompanyDataOrganization
 
@@ -8,10 +9,7 @@ https://github.com/RyoIto-jp/CompanyDataOrganization
 
 ## Installation
 
-
-
-Download zip
-
+ベースにした Python(eel) × React テンプレート
 https://github.com/hrdtbs/template-create-react-app-eel
 
 
@@ -20,7 +18,7 @@ https://github.com/hrdtbs/template-create-react-app-eel
 
 https://www.notion.so/mathworks-lic-211102-854c3b7094c845cbbdaacfb26bc7b98b#05660e71d7ea42a8a7b25aa3a9deab66
 
-pip
+#### pipの初期設定
 
 ```shell
 python -m venv myvenv
@@ -28,7 +26,7 @@ myvenv\Scripts\activate
 myvenv\scripts\python.exe -m pip install --upgrade pip
 ```
 
-
+#### ライブラリのインストールと設定
 
 1. eel
    ```shell
@@ -77,12 +75,12 @@ yarn build:js
 ### Eel
 
 ```shell
-rem reactサーバーをバインドして、Eelを起動
-rem 別ターミナルで実行すること
+#rem reactサーバーをバインドして、Eelを起動
+#rem 別ターミナルで実行すること
 yarn start:js
 yarn start:eel
 
-rem buildしたreactページをEelで起動
+#rem buildしたreactページをEelで起動
 python index.py --product
 ```
 
@@ -147,11 +145,9 @@ if __name__ == '__main__':
 
 
 
-
-
-
 ### フォルダ構成変更
 
+React `./public`, `./src`, `./build` がカレントDirから./webフォルダに変更する。
 `./` -> `web/`
 
 https://www.luku.work/create-react-app-rename-src
@@ -197,11 +193,28 @@ module.exports = {
   },
 ```
 
+## 開発用サーバー立ち上げ
+
+### フロントエンド開発
+
+```shell
+# eelを起動
+python gui.py --develop
+
+# react(rewired)を起動
+yarn start
+```
+
+この状態でフロントエンド側を開発する。
 
 
+#### HOT-Reload
 
-
-
+.envファイルを作って以下を記入
+```shell
+FAST_REFRESH = false
+CHOKIDAR_USEPOLLING=true
+```
 
 eel, playwright
 
@@ -220,21 +233,3 @@ build
 deploy
 
 
-
-
-
-
-
-# デバッグモードの切り替え
-
-### react 開発モード
-
-eelを起動
-
-```
-C:\\Project\\Python\\01_Company\\[gui.py](<http://gui.py/>)
-```
-
-debug_mode は 0。2が良い？かもしれないが、起動しない。必要なら調査。
-
-reactを起動
