@@ -29,7 +29,8 @@ def react_run():
 # 終了時処置
 def python_exit(page, sockets):
     if not sockets:
-        sys.exit()
+        # sys.exit()
+        pass
 
 
 def setChromePath(useDriver=False):
@@ -54,7 +55,7 @@ setChromePath()  # Eel(GUI)を表示するブラウザをChromiumに設定(Chrom
 
 
 if __name__ == '__main__':
-    debug_mode = 0
+    debug_mode = 1
 
     if len(sys.argv) > 1:
         debug_mode = 1 if sys.argv[1] == '--develop' else 0

@@ -13,15 +13,20 @@ class App extends Component {
   constructor(props) {
     super(props);
     eel.set_host("ws://localhost:8888");
-    eel.hello();
+    // eel.hello();
   }
   render() {
     return (
       <div>
-        <CenteredTabs labels={["Users", "Views", "Downloads", "Logs", ]}>
-          <Users></Users>
+        <CenteredTabs labels={[
+          "Views", 
+          "Downloads", 
+          "Users", 
+          "Logs",
+        ]}>
           <ViewPages></ViewPages>
           <DownloadsPage></DownloadsPage>
+          <Users></Users>
           <p>test</p>
         </CenteredTabs>
       </div>

@@ -4,7 +4,7 @@ import csv
 
 def getUsers():
     data = []
-    with open('tmp/users.csv', encoding='sjis') as fr:
+    with open('tmp/users.csv', encoding='cp932') as fr:
         csv_data_obj = csv.DictReader(
             fr,
             delimiter=",",
@@ -18,7 +18,7 @@ def getUsers():
 
 
 def updateUser(users, payload):
-    with open('tmp/users.csv', 'w', encoding='sjis', newline="") as fw:
+    with open('tmp/users.csv', 'w', encoding='cp932', newline="") as fw:
         writer = csv.DictWriter(fw, fieldnames=users[0].keys())
         writer.writeheader()
         for index, elem in enumerate(users):
@@ -30,7 +30,7 @@ def updateUser(users, payload):
 
 
 def addUser(users):
-    with open('tmp/users.csv', 'a', encoding='sjis', newline="") as fw:
+    with open('tmp/users.csv', 'a', encoding='cp932', newline="") as fw:
         writer = csv.DictWriter(fw, fieldnames=users[0].keys())
         newData = {"id": "", "name": "", "created": datetime.datetime.now().strftime("%Y/%m/%d %H:%M"), "modified": ""}
         writer.writerow()
@@ -38,7 +38,7 @@ def addUser(users):
 
 
 def deleteUser(users, deleteIndex):
-    with open('tmp/users.csv', 'w', encoding='sjis', newline="") as fw:
+    with open('tmp/users.csv', 'w', encoding='cp932', newline="") as fw:
         writer = csv.DictWriter(fw, fieldnames=users[0].keys())
         writer.writeheader()
         for index, elem in enumerate(users):

@@ -1,13 +1,22 @@
 import { TextField, Checkbox, Button } from '@material-ui/core';
 import React, { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Delete } from '@material-ui/icons';
+import { Delete, Replay } from '@material-ui/icons';
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 // const eel = window["eel"];
 const useStyles = makeStyles({
     root: {
-
+        padding:"12px 40px",
+    },
+    reload: {
+        alignSelf: 'center',
+        marginLeft: 20,
+        color: 'blue',
+        cursor: 'pointer',
+        "&> :hover":{
+            color: '#59F',
+        }
     },
     message:{
         borderRadius:8,
@@ -52,6 +61,7 @@ const Users = () => {
     const openCsv = async () => {
         await eel.openUsersCsv()();
     }
+    const reloadUsers = () => getUsers();
 
     useEffect(() => {
         getUsers()
@@ -88,6 +98,7 @@ const Users = () => {
         if(confirm("削除してもよろしいですか？")){
             // console.log('yes')
             await eel.deleteUser(users, index)();
+            // window.location.reload();
             getUsers();
         }else{
             console.log('no!')
@@ -98,10 +109,13 @@ const Users = () => {
         <div className={cls.root}>
             <h1>Users</h1>
             {errMsg!=="" && <div className={cls.error}>{errMsg}</div>}
-            <p className={cls.message}>テキスト入力欄は、編集後にEnterボタンを押すことで更新することができます。<br/>
+            <div style={{display:"flex"}}>
+                            <p className={cls.message}>テキスト入力欄は、編集後にEnterボタンを押すことで更新することができます。<br/>
             CSVを直接編集することも可能です。<a href="#" onClick={openCsv} style={{color:'blue', textDecoration:'underline'}}>CSVを開く</a></p>
+            <div className={cls.reload} onClick={reloadUsers} title="CSV直接編集後はクリックでテーブル更新"><Replay></Replay></div>
+            </div>
             <br />
-            <div className={cls.userrow} style={{marginBottom:10}}>
+            <div className={cls.userrow} style={{marginBottom:10, borderBottom: 'solid 3px #5588FF40', width:'fit-content'}}>
                 <div style={{width:180}}>No</div>
                 <div style={{width:180}}>Name</div>
                 <div style={{width:45}}>Enable</div>
@@ -109,7 +123,7 @@ const Users = () => {
                 <div style={{width:140}}>Modified</div>
             </div>
             {users.map((user, index) => (
-                <div className={cls.userrow} key={index}>
+                <div className={cls.userrow} key={index + '-' + user.id}>
                     <UserInputField index={index} name="id" value={user.id} handleSubmit={handleSubmit}/>
                     <UserInputField index={index} name="name" value={user.name} handleSubmit={handleSubmit}/>
                     <UserCheckBox index={index} checked={user.status} handleSubmit={handleSubmit}/>
@@ -131,6 +145,8 @@ const UserInputField = ({ index, name, value, handleSubmit }) => {
         console.log(e.target.value)
         setUserValue(e.target.value)
     }
+
+
     return (
         <TextField
             name={name}
@@ -160,7 +176,7 @@ const UserCheckBox = ({index, checked, handleSubmit}) => {
     function handleCheck(){
         setUserChecked(!userChecked)
         console.log(!userChecked, checked)
-        handleSubmit({index:index, key:'status', value: userChecked? '1': '0'})
+        handleSubmit({index:index, key:'status', value: !userChecked? '1': '0'})
     }
     return (
         <Checkbox checked={userChecked} onChange={handleCheck}/>

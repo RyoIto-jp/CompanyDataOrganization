@@ -1,13 +1,45 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Years, Months } from '../data/data'
 import { Button, TextField, Switch, FormControlLabel } from "@material-ui/core";
+import { makeStyles } from '@material-ui/styles'
 import SimpleSelect from '../component/SimpleSelect';
 
 const eel = window["eel"];
 
+const useStyles = makeStyles({
+  root: {
+    padding: "12px 40px",
+  },
+  members: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    height: 120,
+    overflowY: 'scroll',
+    padding: '10px 20px 0 20px',
+    border:'solid 1px #CCC',
+    backgroundColor: '#EEEEEE80',
+    position: 'relative',
+    "&> div": {
+      padding: 2,
+      color:'#777',
+      width:200,
+      display: 'flex',
+      // justifyContent: 'space-around',
+      gap:12,
+    }
+  },
+  membermsg: {
+    color: '#777',
+    textAlign: 'right',
+    fontSize: '.85rem'
+  }
+})
+
 const DownloadsPage = () => {
-  const [message, setMessage] = React.useState({ text: "", type: 0 });
-  const [val, setVal] = React.useState({
+  const [message, setMessage] = useState({ text: "", type: 0 });
+  const [users, setUsers] = useState([])
+  const [val, setVal] = useState({
     Year: 2021,
     Month: '4',
     username: '',
@@ -15,12 +47,36 @@ const DownloadsPage = () => {
     members: '',
     isSelf: true
   });
+  const cls = useStyles();
 
+  useEffect(() => {
+    setInitialFormData()
+  }, [])
+
+  /** 入力フォーム初期値 */
+  const setInitialFormData = async () => {
+    const user_data = await eel.getUsers()();
+    setUsers(user_data.filter(x=>x.status === '1'))
+    console.log(user_data.filter(x=>x.status === '1'))
+    const dt = new Date();
+    const data = {
+      Year: dt.getFullYear(),
+      Month: String(dt.getMonth() + 1),
+      username: '',
+      password: '',
+      members: user_data.filter(x=>x.status === '1').map(x => x.id).join(","),
+      isSelf: true
+    }
+    setVal(data)
+  }
+
+  /** Form入力ハンドラー */
   const handleChange = (event) => {
     setVal({ ...val, [event.target.name]: event.target.value });
-    console.log(val);
+    // console.log(val);
   };
 
+  /** 自身のデータを含めるのSwitch切り替え */
   const handleBool = (event) => {
     setVal({ ...val, [event.target.name]: event.target.checked });
   }
@@ -43,6 +99,7 @@ const DownloadsPage = () => {
   /** 前回データの読み込み(Python) */
   const pyLoadHistory = async () => {
     let result = await eel.load_pickle('company_cond')();
+    result.members = val.members;
     setVal(result)
   }
 
@@ -87,7 +144,7 @@ const DownloadsPage = () => {
       )}
 
       <br />
-      {/* User Data */}
+      {/* Login Form */}
       <div style={{ display: "flex", gap: 20, minWidth: 240 }}>
         <TextField
           style={{ width: "100%" }}
@@ -123,18 +180,15 @@ const DownloadsPage = () => {
       {/* 自身のデータを含める */}
       <FormControlLabel control={<Switch checked={val.isSelf} name="isSelf" onChange={handleBool} color="primary" />} label="自身のデータを含める" style={{ color: "#888" }} />
 
-      {/* Members */}
-      <TextField
-        label="members"
-        name="members"
-        value={val["members"]}
-        onChange={handleChange}
-        multiline
-        minRows={4}
-        variant="outlined"
-        helperText={"データを取得したい社員番号をカンマ区切りで入力してください。"}
-        style={{ marginTop: 10 }}
-      />
+      {/* Members2 */}
+      <div className={cls.members}>
+        {users.map((user, index) => (
+          <div key={`user-${user.id}`}>
+            <span>{user.id}</span><span>{user.name}</span>
+          </div>
+        ))}
+      </div>
+      <span className={cls.membermsg}>※ 読み込みたいユーザー情報は「USER」タブから編集してください。</span>
 
       <div>
         <hr />
