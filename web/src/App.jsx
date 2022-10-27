@@ -5,7 +5,7 @@ import './App.css';
 import { CenteredTabs } from './component/Tabs';
 import ViewPages from './page/ViewPages';
 import DownloadsPage from './page/DownloadsPage'
-import Users from "./page/Users";
+import UsersPage from "./page/UsersPage";
 
 import { eel } from "./function/eel.js";
 
@@ -19,14 +19,14 @@ class App extends Component {
     return (
       <div>
         <CenteredTabs labels={[
-          "Views", 
           "Downloads", 
+          "Views", 
           "Users", 
           "Logs",
         ]}>
-          <ViewPages></ViewPages>
           <DownloadsPage></DownloadsPage>
-          <Users></Users>
+          <ViewPages></ViewPages>
+          <UsersPage></UsersPage>
           <p>test</p>
         </CenteredTabs>
       </div>

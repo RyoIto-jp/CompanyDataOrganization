@@ -45,7 +45,8 @@ const DownloadsPage = () => {
     username: '',
     password: '',
     members: '',
-    isSelf: true
+    isSelf: true,
+    async: false,
   });
   const cls = useStyles();
 
@@ -55,17 +56,19 @@ const DownloadsPage = () => {
 
   /** 入力フォーム初期値 */
   const setInitialFormData = async () => {
-    const user_data = await eel.getUsers()();
-    setUsers(user_data.filter(x=>x.status === '1'))
-    console.log(user_data.filter(x=>x.status === '1'))
+    const response = await eel.getUsers()();
+    const user_data = response.map(x=> ({...x, progress: 0})).filter(x=>x.status === '1')
+    setUsers(user_data)
+    console.log(user_data)
     const dt = new Date();
     const data = {
       Year: dt.getFullYear(),
       Month: String(dt.getMonth() + 1),
       username: '',
       password: '',
-      members: user_data.filter(x=>x.status === '1').map(x => x.id).join(","),
-      isSelf: true
+      members: user_data.map(x => x.id).join(","),
+      isSelf: true,
+      async: false,
     }
     setVal(data)
   }
@@ -103,10 +106,23 @@ const DownloadsPage = () => {
     setVal(result)
   }
 
+  // THREAD: 618679 - ENTER
+  // THREAD: 629600 - LOADED
   /** Update Message: Pythonから呼び出される */
-  function pyUpdateMessage(text_message) {
+  async function pyUpdateMessage(text_message) {
     const isErr = text_message.toUpperCase().includes('ERROR')
     console.log(isErr)
+    let newUsers = [...users]
+    if(text_message.slice(0,6) === 'THREAD'){
+      const prog_idx = {'ENTER': 20,LOGIN:40, FIND:50, LOADED: 60, EXIT: 100}
+      const user_id = text_message.slice(8, 14)
+      const progress = prog_idx[text_message.split('-')[1].trim()]
+      console.log(user_id, progress, newUsers.findIndex(x=>x.id===user_id))
+      console.log(text_message)
+
+      newUsers[newUsers.findIndex(x=>x.id===user_id)].progress = progress
+      setUsers(newUsers)
+    }
     setMessage({ text: text_message, type: isErr ? 9 : 0 })
   }
   try {
@@ -177,14 +193,18 @@ const DownloadsPage = () => {
       </div>
 
       <br />
-      {/* 自身のデータを含める */}
-      <FormControlLabel control={<Switch checked={val.isSelf} name="isSelf" onChange={handleBool} color="primary" />} label="自身のデータを含める" style={{ color: "#888" }} />
+      <div>
+        {/* 自身のデータを含める */}
+        <FormControlLabel control={<Switch checked={val.isSelf} name="isSelf" onChange={handleBool} color="primary" />} label="自身のデータを含める" style={{ color: "#888" }} />
+        {/* 非同期処理を有効にする */}
+        <FormControlLabel control={<Switch checked={val.async} name="async" onChange={handleBool} color="primary" />} label="非同期処理を有効にする" style={{ color: "#888" }} />
+      </div>
 
       {/* Members2 */}
       <div className={cls.members}>
         {users.map((user, index) => (
           <div key={`user-${user.id}`}>
-            <span>{user.id}</span><span>{user.name}</span>
+            <span>{user.id}</span><span>{user.name}</span><span>{user.progress}%</span>
           </div>
         ))}
       </div>

@@ -1,6 +1,6 @@
 import eel
 from . import pickle_obj as pkl
-from . import company
+# from . import company
 import datetime
 import glob
 import time
@@ -21,7 +21,7 @@ def load_labels_from_file():
 
 
 def getMembers(val):
-    print(val)
+    # print(val)
     members = [x.strip() for x in val.split(",")]
     for member in members:
         if len(member) != 6:
@@ -38,6 +38,10 @@ def updateMessage(text):
 
 @eel.expose
 def py_download_company(val):
+    if val["async"]:
+        from . import mult_web as company  # 非同期処理有効：高速化、サーバー負荷増
+    else:
+        from . import company
     print(val)
     print('called')
     pkl.pkl_dumps_loads(val, 'company_cond')
@@ -69,7 +73,7 @@ def load_pickle(obj_name):
 def getFileList():
     fileList = glob.glob("./result/*.csv")
     fileList = [x.replace("./result\\", "") for x in fileList]
-    print(fileList)
+    # print(fileList)
     return fileList
 
 
@@ -107,10 +111,18 @@ def hello():
 # ----------
 # Users
 # ----------
+USERS_CSV = 'tmp/users.csv'
+FIELD_NAMES = ['id', 'name', 'status', 'created', 'modified']
+
+
 @eel.expose
 def getUsers():
+    print('call GetUsers()')
     data = []
-    with open('tmp/users.csv', encoding='cp932') as fr:
+    msg = checkUsersFile(USERS_CSV)
+    if msg:
+        print(msg)
+    with open(USERS_CSV, encoding='cp932') as fr:
         csv_data_obj = csv.DictReader(
             fr,
             delimiter=",",
@@ -123,15 +135,25 @@ def getUsers():
     return data
 
 
+def checkUsersFile(csv_path):
+    if not os.path.exists(csv_path):
+        with open(csv_path, 'w', encoding='cp932') as fw:
+            writer = csv.writer(fw)
+            writer.writerow(FIELD_NAMES)
+        return 'CSVファイルが存在しないため、新規作成しました。'
+
+
 @eel.expose
 def openUsersCsv():
-    os.system("start " + os.path.join(os.getcwd(), 'tmp/users.csv'))
+    print('call openUsersCsv')
+    os.system("start " + os.path.join(os.getcwd(), USERS_CSV))
 
 
 @eel.expose
 def updateUser(users, payload):
-    with open('tmp/users.csv', 'w', encoding='cp932', newline="") as fw:
-        writer = csv.DictWriter(fw, fieldnames=users[0].keys())
+    print('call ')
+    with open(USERS_CSV, 'w', encoding='cp932', newline="") as fw:
+        writer = csv.DictWriter(fw, fieldnames=FIELD_NAMES)
         writer.writeheader()
         for index, elem in enumerate(users):
             if index == payload["index"]:
@@ -143,9 +165,10 @@ def updateUser(users, payload):
 
 @eel.expose
 def addUser(users):
+    print('call addUser')
     print(datetime.datetime.now())
-    with open('tmp/users.csv', 'a', encoding='cp932', newline="") as fw:
-        writer = csv.DictWriter(fw, fieldnames=users[0].keys())
+    with open(USERS_CSV, 'a', encoding='cp932', newline="") as fw:
+        writer = csv.DictWriter(fw, fieldnames=FIELD_NAMES)
         newData = {"id": "", "name": "", "created": datetime.datetime.now().strftime("%Y/%m/%d %H:%M"), "modified": ""}
         writer.writerow(newData)
     return newData
@@ -153,8 +176,9 @@ def addUser(users):
 
 @eel.expose
 def deleteUser(users, deleteIndex):
-    with open('tmp/users.csv', 'w', encoding='cp932', newline="") as fw:
-        writer = csv.DictWriter(fw, fieldnames=users[0].keys())
+    print('call deleteUser')
+    with open(USERS_CSV, 'w', encoding='cp932', newline="") as fw:
+        writer = csv.DictWriter(fw, fieldnames=FIELD_NAMES)
         writer.writeheader()
         for index, elem in enumerate(users):
             if index == deleteIndex:

@@ -1,7 +1,13 @@
 from playwright.sync_api import Playwright, sync_playwright
-from . import find_browser
+import time
 import csv
 import os
+try:
+    from . import find_browser
+except Exception:
+    import sys
+    sys.path.append(os.path.join(os.getcwd(), '..'))
+    import find_browser
 
 
 def loginCompany(page, cred):
@@ -77,6 +83,23 @@ def navMemberPage(page, target_date, empNum):
     return page, empName, reportStatus
 
 
+def getUserWorkTime(page, empNum, empName, reportStatus, target_date):
+    # 印刷用ページを開く
+    popup = navPrintPage(page)
+
+    # テーブル情報を取得
+    result = getTable(popup, target_year=target_date[0])
+
+    # 結果を整形
+    result = [{**row, "Name": empName, "Num": empNum, "Report": reportStatus} for row in result]
+
+    # 結果をCSV出力
+    exportCSV(result, empNum, empName, target_date)
+
+    popup.close()
+    # todo
+
+
 def navPrintPage(page):
     with page.expect_event("popup") as page_info:
         page.locator("input[name=\"btnPrint\"]").click()
@@ -128,6 +151,9 @@ def getTable(popup, target_year):
         # 業務区分
         rowWork = tempWork.text_content()
 
+        # 実働時間
+        actual = row.query_selector("td:nth-child(11)").text_content()
+
         # 日付
         tempDate = row.query_selector("td >> nth=0")
         # 日付がない行は処理をしない
@@ -156,6 +182,7 @@ def getTable(popup, target_year):
             result_row['status'] = rowStatus
             result_row["times"] = resPrj
             result_row["type"] = prj.query_selector("td:nth-child(2)").text_content()
+            result_row["actual"] = actual
 
             # データが存在しなければこの行はスキップ。
             if resPrj == "":
@@ -191,23 +218,6 @@ def exportCSV(result, empNum, empName, target_date):
         print("I/O error")
 
 
-def getUserWorkTime(page, empNum, empName, reportStatus, target_date):
-    # 印刷用ページを開く
-    popup = navPrintPage(page)
-
-    # テーブル情報を取得
-    result = getTable(popup, target_year=target_date[0])
-
-    # 結果を整形
-    result = [{**row, "Name": empName, "Num": empNum, "Report": reportStatus} for row in result]
-
-    # 結果をCSV出力
-    exportCSV(result, empNum, empName, target_date)
-
-    popup.close()
-    # todo
-
-
 def run(playwright: Playwright, web_settings: dict, eel) -> None:
     credential = web_settings["credential"]
     target_date = web_settings["target_date"]
@@ -218,9 +228,13 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
     if not chrome_path:
         chrome_path = "./driver/chrome-win/chrome.exe"
 
+    headless = True  # ! -- DEBUG --
+    if eel:
+        headless = True
+
     print("start playwright...")
     browser = playwright.chromium.launch(
-        headless=True,  # ! DEBUG
+        headless=headless,  # ! DEBUG
         executable_path=chrome_path)
     context = browser.new_context()
 
@@ -280,19 +294,26 @@ def main(web_settings: dict, eel=None):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     # Companyの認証情報を設定
     credential = {"user": "608409", "pass": os.environ.get("OST_PW")}
 
     # 取得したい社員番号リストを設定
     EmployeeNumbers = [
-        "618329",
-        "611606",
-        # "629576", "319794",
-        # "611646", "611674", "618679", "629576", "629588", "629600", "629606"
+        # "319794",  # 小田　龍哉
+        "608401",  # 横山　洸二
+        "611606",  # 髙田　純也
+        # "611646",  # 中川　拓哉
+        # "611674",  # 林　大貴
+        # "618329",  # 松田　翔
+        # "618679",  # 大木　美保
+        "629588",  # 笠原　誠人
+        "629600",  # 中山　晴登
+        "629606",  # 竹本　脩二
     ]
 
     # 対象月度を設定
-    target_date = ("2021", "12")
+    target_date = ("2022", "10")
 
     # parameter
     web_settings = {
@@ -304,3 +325,5 @@ if __name__ == '__main__':
 
     # メイン処理を実行
     main(web_settings)
+
+    print('all end', time.time() - start_time)
