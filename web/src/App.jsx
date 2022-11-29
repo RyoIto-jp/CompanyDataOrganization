@@ -19,13 +19,13 @@ class App extends Component {
     return (
       <div>
         <CenteredTabs labels={[
-          "Downloads", 
           "Views", 
+          "Downloads", 
           "Users", 
           "Logs",
         ]}>
-          <DownloadsPage></DownloadsPage>
           <ViewPages></ViewPages>
+          <DownloadsPage></DownloadsPage>
           <UsersPage></UsersPage>
           <p>test</p>
         </CenteredTabs>
