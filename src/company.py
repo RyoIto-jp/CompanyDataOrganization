@@ -18,7 +18,7 @@ def loginCompany(page, cred):
     page.locator("input[name=\"uid\"]").fill(cred["user"])
     page.locator("input[name=\"pwd\"]").fill(cred["pass"])
     page.locator("input[alt=\"login\"]").press("Enter")
-    
+
     loginStatus = False
     if page.title() == 'メインメニュー':
         loginStatus = True
@@ -52,8 +52,10 @@ def navMyPage(page, target_date):
             os.system('pause')
 
     page.wait_for_load_state("load")
-    empName = page.locator('.syain > div:nth-child(2)').text_content().replace('社員名称：\xa0', '').replace('\u3000', ' ')
-    header_text = page.query_selector("form[name=\"FormListPersonalDetails\"]").text_content()
+    empName = page.locator(
+        '.syain > div:nth-child(2)').text_content().replace('社員名称：\xa0', '').replace('\u3000', ' ')
+    header_text = page.query_selector(
+        "form[name=\"FormListPersonalDetails\"]").text_content()
 
     reportStatus = getReportStatus(header_text)
 
@@ -63,7 +65,8 @@ def navMyPage(page, target_date):
 def navMemberPage(page, target_date, empNum):
     # fill condition values
     page.locator("input[name=\"\\@PSTDDATEYEAR\"]").fill(target_date[0])
-    page.locator("select[name=\"\\@PSTDDATEMONTH\"]").select_option(target_date[1])
+    page.locator(
+        "select[name=\"\\@PSTDDATEMONTH\"]").select_option(target_date[1])
     page.locator("select[name=\"\\@PSTDDATEDAY\"]").select_option("1")
     page.locator("input[name=\"emps_cond\"]").fill(empNum)
 
@@ -75,7 +78,8 @@ def navMemberPage(page, target_date, empNum):
     empName = page.locator("#EmpNm1").text_content().replace("\u3000", ' ')
 
     # todo: 提出状況
-    reportStatus = page.locator("#flowinfo1").text_content().replace("\u3000", ' ')
+    reportStatus = page.locator(
+        "#flowinfo1").text_content().replace("\u3000", ' ')
     print(reportStatus)
 
     # Click input:has-text("詳細")
@@ -91,7 +95,8 @@ def getUserWorkTime(page, empNum, empName, reportStatus, target_date):
     result = getTable(popup, target_year=target_date[0])
 
     # 結果を整形
-    result = [{**row, "Name": empName, "Num": empNum, "Report": reportStatus} for row in result]
+    result = [{**row, "Name": empName, "Num": empNum,
+               "Report": reportStatus} for row in result]
 
     # 結果をCSV出力
     exportCSV(result, empNum, empName, target_date)
@@ -120,7 +125,7 @@ def getReportStatus(header_text):
         if choice in header_text:
             return choices[choice]
             break
-    
+
     return "empty"
 
 
@@ -137,8 +142,28 @@ def getStatus(class_name):
         return ''
 
 
+def sumTimes(strtime_list: list[str]) -> str:
+    """配列内時刻の合計を計算
+
+    Args:
+        strtime_list (list): ex.['10:30','9:00']
+
+    Returns:
+        str: ex. '19:30'
+    """
+    totalSec: int = 0
+    for strTime in strtime_list:
+        t = time.strptime(strTime, '%H:%M')
+        totalSec += t.tm_hour * 3600 + t.tm_min * 60 + t.tm_sec
+    t_hour = totalSec // 3600
+    t_min = totalSec % 3600 // 60
+    totalTime = str(t_hour).zfill(2) + ':' + str(t_min).zfill(2)
+    return totalTime
+
+
 def getTable(popup, target_year):
-    table_rows = popup.query_selector_all("table[name=\"APPROVALGRD\"] > tbody > tr")
+    table_rows = popup.query_selector_all(
+        "table[name=\"APPROVALGRD\"] > tbody > tr")
 
     # initialize
     result_row = {}
@@ -158,23 +183,31 @@ def getTable(popup, target_year):
         tempDate = row.query_selector("td >> nth=0")
         # 日付がない行は処理をしない
         if tempDate.query_selector("#MONTH"):
-            targetDate = target_year + '-' + tempDate.query_selector("#MONTH").text_content() + '-' + tempDate.query_selector("#DAY").text_content()
+            targetDate = target_year + '-' + tempDate.query_selector(
+                "#MONTH").text_content() + '-' + tempDate.query_selector("#DAY").text_content()
             print(targetDate)
 
         # project code
         # time, code, name: 35-000
-        tempProjects = row.query_selector("td:nth-child(33) > table:nth-child(1) > tbody")
+        tempProjects = row.query_selector(
+            "td:nth-child(33) > table:nth-child(1) > tbody")
         comment_idx = 35
         resPrj = ""
-        # PJ実働 22/11追加
-        pjsum = row.query_selector("td:nth-child(32)").text_content()
 
         # ProjectCode列にTableなし時はスキップ。
         if not tempProjects:
-            tempProjects = row.query_selector("td:nth-child(14) > table:nth-child(1) > tbody")
-            comment_idx = 15
-            if not tempProjects:
+            # 本人画面の場合
+            tempProjects = row.query_selector(
+                "td:nth-child(14) > table:nth-child(1) > tbody")
+            if tempProjects:
+                tempTimes = [p.query_selector("td:nth-child(3)").text_content()[1:-1] for p in tempProjects.query_selector_all("tr")]
+                pjsum = sumTimes(tempTimes)  # 本人画面の場合、PJ実働列存在しないため無効値
+                comment_idx = 15
+            else:
                 continue
+        else:
+            # PJ実働 22/11追加
+            pjsum = row.query_selector("td:nth-child(32)").text_content()
 
         # 各行の1列目のデータが35-000なら取得。
         for prj in tempProjects.query_selector_all("tr"):
@@ -183,7 +216,8 @@ def getTable(popup, target_year):
             result_row["work"] = rowWork
             result_row['status'] = rowStatus
             result_row["times"] = resPrj
-            result_row["type"] = prj.query_selector("td:nth-child(2)").text_content()
+            result_row["type"] = prj.query_selector(
+                "td:nth-child(2)").text_content()
             result_row["actual"] = actual
             result_row["pjsum"] = pjsum
 
@@ -192,7 +226,8 @@ def getTable(popup, target_year):
                 continue
 
             # 備考欄を取得
-            tempComment = row.query_selector(f"td:nth-child({comment_idx})").text_content().replace('\xa0', '')
+            tempComment = row.query_selector(
+                f"td:nth-child({comment_idx})").text_content().replace('\xa0', '')
             result_row["comment"] = tempComment
 
             # 取得結果をresultに格納
@@ -231,7 +266,7 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
     if not chrome_path:
         chrome_path = "./driver/chrome-win/chrome.exe"
 
-    headless = True  # ! -- DEBUG --
+    headless = False  # ! -- DEBUG --
     if eel:
         headless = True
 
@@ -250,11 +285,11 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
 
     # Login to Company
     page, loginStatus = loginCompany(page, credential)
-    
+
     if not loginStatus:
         if eel:
             eel.pyUpdateMessage("ログインに失敗しました。処理を中断します。")
-    
+
     else:
         if eel:
             eel.pyUpdateMessage("Company認証完了")
@@ -266,7 +301,12 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
             if eel:
                 eel.pyUpdateMessage(f"{empName}の処理を実行中")
             # 工数CSVを取得
-            getUserWorkTime(page, credential['user'], empName, reportStatus, target_date)
+            getUserWorkTime(
+                page,
+                credential['user'],
+                empName,
+                reportStatus,
+                target_date)
             page.locator('.globalnavi > div:nth-child(1) > a').click()
             print('complete my worktime')
 
@@ -274,7 +314,8 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
         page = moveToApprovalPage(page)
 
         for i, empNum in enumerate(members):
-            page, empName, reportStatus = navMemberPage(page, target_date, empNum)
+            page, empName, reportStatus = navMemberPage(
+                page, target_date, empNum)
 
             if eel:
                 eel.pyUpdateMessage(f"{empName}の処理を実行中 {i + 1}/{len(members)}")
@@ -323,7 +364,7 @@ if __name__ == '__main__':
         "credential": credential,
         "target_date": target_date,
         "members": EmployeeNumbers,
-        "is_self": False  # !debug
+        "is_self": True  # !debug
     }
 
     # メイン処理を実行
