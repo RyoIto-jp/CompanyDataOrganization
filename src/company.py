@@ -163,9 +163,11 @@ def getTable(popup, target_year):
 
         # project code
         # time, code, name: 35-000
-        tempProjects = row.query_selector("td:nth-child(32) > table:nth-child(1) > tbody")
+        tempProjects = row.query_selector("td:nth-child(33) > table:nth-child(1) > tbody")
         comment_idx = 35
         resPrj = ""
+        # PJ実働 22/11追加
+        pjsum = row.query_selector("td:nth-child(32)").text_content()
 
         # ProjectCode列にTableなし時はスキップ。
         if not tempProjects:
@@ -183,6 +185,7 @@ def getTable(popup, target_year):
             result_row["times"] = resPrj
             result_row["type"] = prj.query_selector("td:nth-child(2)").text_content()
             result_row["actual"] = actual
+            result_row["pjsum"] = pjsum
 
             # データが存在しなければこの行はスキップ。
             if resPrj == "":
@@ -308,19 +311,19 @@ if __name__ == '__main__':
         # "618329",  # 松田　翔
         # "618679",  # 大木　美保
         "629588",  # 笠原　誠人
-        "629600",  # 中山　晴登
+        # "629600",  # 中山　晴登
         "629606",  # 竹本　脩二
     ]
 
     # 対象月度を設定
-    target_date = ("2022", "10")
+    target_date = ("2022", "11")
 
     # parameter
     web_settings = {
         "credential": credential,
         "target_date": target_date,
         "members": EmployeeNumbers,
-        "is_self": True
+        "is_self": False  # !debug
     }
 
     # メイン処理を実行
