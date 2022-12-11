@@ -9,6 +9,8 @@ except Exception:
     sys.path.append(os.path.join(os.getcwd(), '..'))
     import find_browser
 
+prefix = "THREAD"
+
 
 def loginCompany(page, cred):
     # Go to Company Web page
@@ -88,6 +90,7 @@ def navMemberPage(page, target_date, empNum):
 
 
 def getUserWorkTime(page, empNum, empName, reportStatus, target_date):
+
     # 印刷用ページを開く
     popup = navPrintPage(page)
 
@@ -262,8 +265,11 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
     members = web_settings["members"]
     is_self = web_settings.get("is_self")
 
-    chrome_path = find_browser.findBrowserPath('chrome')
-    if not chrome_path:
+    if web_settings.get('webdriver') is not None:
+        print('use installed chrome')
+        chrome_path = find_browser.findBrowserPath('chrome')
+    else:
+        print('use webdriver in app dir')
         chrome_path = "./driver/chrome-win/chrome.exe"
 
     headless = False  # ! -- DEBUG --
@@ -298,6 +304,7 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
         if is_self:
             # todo: 月度移動
             page, empName, reportStatus = navMyPage(page, target_date)
+            
             if eel:
                 eel.pyUpdateMessage(f"{empName}の処理を実行中")
             # 工数CSVを取得
@@ -314,15 +321,21 @@ def run(playwright: Playwright, web_settings: dict, eel) -> None:
         page = moveToApprovalPage(page)
 
         for i, empNum in enumerate(members):
+            if eel:
+                eel.pyUpdateMessage(prefix + ": %s - LOGIN" % empNum)
+
             page, empName, reportStatus = navMemberPage(
                 page, target_date, empNum)
 
             if eel:
                 eel.pyUpdateMessage(f"{empName}の処理を実行中 {i + 1}/{len(members)}")
+                eel.pyUpdateMessage(prefix + ": %s - LOADED" % empNum)
 
             # 工数CSVを取得
             getUserWorkTime(page, empNum, empName, reportStatus, target_date)
             page.query_selector('#BTNBCK0').click()
+            if eel:
+                eel.pyUpdateMessage(prefix + ": %s - EXIT" % empNum)
 
         if eel:
             eel.pyUpdateMessage("処理が完了しました")

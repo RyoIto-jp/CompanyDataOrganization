@@ -56,7 +56,7 @@ def setChromePath(useDriver=False):
 
 
 disable_chromium_api_message()
-setChromePath()  # Eel(GUI)を表示するブラウザをChromiumに設定(Chrome未インストールPC用)
+setChromePath(useDriver=True)  # Eel(GUI)を表示するブラウザをChromiumに設定(Chrome未インストールPC用)
 
 
 if __name__ == '__main__':

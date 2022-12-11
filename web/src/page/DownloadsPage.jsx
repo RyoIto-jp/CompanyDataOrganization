@@ -122,8 +122,9 @@ const DownloadsPage = () => {
 
       newUsers[newUsers.findIndex(x=>x.id===user_id)].progress = progress
       setUsers(newUsers)
+    }else{
+      setMessage({ text: text_message, type: isErr ? 9 : 0 })
     }
-    setMessage({ text: text_message, type: isErr ? 9 : 0 })
   }
   try {
     window.eel.expose(pyUpdateMessage, 'pyUpdateMessage');

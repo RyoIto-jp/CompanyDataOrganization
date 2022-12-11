@@ -216,6 +216,12 @@ FAST_REFRESH = false
 CHOKIDAR_USEPOLLING=true
 ```
 
+#### py2exe
+
+```shell
+python -m eel gui.py web/build --onefile --clean
+```
+
 eel, playwright
 
 eel api
